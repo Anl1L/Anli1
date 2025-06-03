@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anli - Создавайте аниме-видео с ИИ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Глобальные стили */
+        :root {
+            --primary: #ff6b9e;
+            --secondary: #9d65c9;
+            --dark: #1a1a2e;
+            --light: #f8f4ff;
+            --accent: #5ce1e6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            background-image: url('https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 26, 46, 0.85);
+            z-index: -1;
+        }
+        
+        /* Шапка сайта */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background-color: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--primary);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 40px;
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 107, 158, 0.5);
+            font-style: italic;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+            background-color: rgba(255, 107, 158, 0.1);
+        }
+        
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover::after {
+            width: 70%;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 15px rgba(255, 107, 158, 0.5);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 107, 158, 0.8);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--dark);
+        }
+        
+        /* Основной контент */
+        main {
+            margin-top: 80px;
+            min-height: calc(100vh - 160px);
+            padding: 2rem 5%;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 5rem 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(255, 107, 158, 0.5);
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 107, 158, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 107, 158, 0.8), 0 0 30px rgba(92, 225, 230, 0.6);
+            }
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--light);
+            opacity: 0.9;
+        }
+        
+        .prompt-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .prompt-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--secondary);
+            background-color: rgba(26, 26, 46, 0.7);
+            color: var(--light);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .prompt-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(255, 107, 158, 0.5);
+        }
+        
+        .prompt-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .examples {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .example-tag {
+            background-color: rgba(157, 101, 201, 0.2);
+            color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--secondary);
+        }
+        
+        .example-tag:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        /* Секция создания видео */
+        .creation-section {
+            display: none;
+            background-color: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1.5rem;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .setting-group {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-group h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+            opacity: 0.8;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 5px;
+            border: 1px solid var(--secondary);
+            background-color: rgba(26, 26, 46, 0.7);
+            color: var(--light);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(255, 107, 158, 0.5);
+        }
+        
+        .advanced-settings {
+            margin-top: 2rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .advanced-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .advanced-content {
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        /* Галерея */
+        .gallery-section {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0.3rem 1rem;
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--light);
+            padding: 0.5rem;
+            width: 200px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .item-overlay {
+            opacity: 1;
+        }
+        
+        .item-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-author img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        
+        .item-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+        
+        /* Подвал */
+        footer {
+            background-color: rgba(26, 26, 46, 0.9);
+            padding: 3rem 5%;
+            border-top: 1px solid var(--primary);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-column h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: var(--light);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            color: var(--light);
+            font-size: 1.5rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+        
+        /* Анимации */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: 1rem 0;
+            }
+            
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .filters {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка сайта -->
+    <header>
+        <a href="#" class="logo">
+            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Anli Logo">
+            <h1>Anli</h1>
+        </a>
+        
+        <nav>
+            <ul>
+                <li><a href="#" class="active" id="home-link">Главная</a></li>
+                <li><a href="#" id="create-link">Создать</a></li>
+                <li><a href="#" id="gallery-link">Галерея</a></li>
+                <li><a href="#">Тарифы</a></li>
+                <li><a href="#">Документация</a></li>
+            </ul>
+        </nav>
+        
+        <div class="auth-buttons">
+            <button class="btn btn-outline">Войти</button>
+            <button class="btn btn-primary">Регистрация</button>
+        </div>
+    </header>
+    
+    <!-- Основной контент -->
+    <main>
+        <!-- Главная страница -->
+        <section id="home-section">
+            <div class="hero">
+                <h2>Создавайте потрясающие аниме-видео с ИИ</h2>
+                <p>Превратите ваши идеи в анимированные шедевры с помощью искусственного интеллекта. Просто опишите сцену - мы сделаем всё остальное!</p>
+                
+                <div class="prompt-box floating">
+                    <input type="text" class="prompt-input" placeholder="Опишите ваше видео...">
+                    <button class="btn btn-primary" style="width: 100%;">Создать</button>
+                </div>
+                
+                <div class="examples">
+                    <div class="example-tag">Кот на скейтборде, мультяшный стиль</div>
+                    <div class="example-tag">Самурай в цветущем саду, аниме</div>
+                    <div class="example-tag">Киберпанк-город будущего</div>
+                    <div class="example-tag">Девушка-волшебница, фэнтези</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Раздел создания видео -->
+        <section id="create-section" class="creation-section">
+            <h2 class="section-title"><i class="fas fa-magic"></i> Создание видео</h2>
+            
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <h3>Основные настройки</h3>
+                    
+                    <div class="form-group">
+                        <label for="scene-description">Описание сцены</label>
+                        <textarea id="scene-description" class="form-control" rows="4" placeholder="Подробно опишите, что вы хотите увидеть в видео..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="style">Стиль</label>
+                        <select id="style" class="form-control">
+                            <option value="anime">Аниме</option>
+                            <option value="realistic">Реализм</option>
+                            <option value="cartoon">Мультфильм</option>
+                            <option value="3d">3D</option>
+                            <option value="pixel">Пиксель-арт</option>
+                            <option value="watercolor">Акварель</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3>Параметры видео</h3>
+                    
+                    <div class="form-group">
+                        <label for="aspect-ratio">Соотношение сторон</label>
+                        <select id="aspect-ratio" class="form-control">
+                            <option value="16:9">16:9 (горизонтальное)</option>
+                            <option value="9:16">9:16 (вертикальное)</option>
+                            <option value="1:1">1:1 (квадрат)</option>
+                            <option value="4:5">4:5 (Instagram)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Длительность</label>
+                        <select id="duration" class="form-control">
+                            <option value="3">3 секунды</option>
+                            <option value="5" selected>5 секунд</option>
+                            <option value="10">10 секунд</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="motion">Интенсивность движения</label>
+                        <select id="motion" class="form-control">
+                            <option value="low">Низкая</option>
+                            <option value="medium" selected>Средняя</option>
+                            <option value="high">Высокая</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <h3>Дополнительно</h3>
+                    
+                    <div class="form-group">
+                        <label for="seed">Seed (опционально)</label>
+                        <input type="text" id="seed" class="form-control" placeholder="Оставьте пустым для случайного">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reference">Загрузить изображение/видео</label>
+                        <input type="file" id="reference" class="form-control">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="advanced-settings">
+                <div class="advanced-header">
+                    <h3><i class="fas fa-cog"></i> Расширенные настройки</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                
+                <div class="advanced-content">
+                    <div class="form-group">
+                        <label for="fps">Частота кадров</label>
+                        <select id="fps" class="form-control">
+                            <option value="24">24 к/с (кинематографический)</option>
+                            <option value="30" selected>30 к/с (стандартный)</option>
+                            <option value="60">60 к/с (плавный)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="detail">Уровень детализации</label>
+                        <select id="detail" class="form-control">
+                            <option value="low">Низкий</option>
+                            <option value="medium" selected>Средний</option>
+                            <option value="high">Высокий</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="effects">Эффекты</label>
+                        <select id="effects" class="form-control">
+                            <option value="none">Нет</option>
+                            <option value="blur">Размытие</option>
+                            <option value="glow">Свечение</option>
+                            <option value="vignette">Виньетка</option>
+                            <option value="grain">Зернистость</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary"><i class="fas fa-magic"></i> Создать</button>
+                <button class="btn btn-outline"><i class="fas fa-save"></i> Сохранить как черновик</button>
+                <button class="btn btn-outline"><i class="fas fa-random"></i> Случайный запрос</button>
+            </div>
+        </section>
+        
+        <!-- Галерея -->
+        <section id="gallery-section" class="gallery-section">
+            <div class="filters">
+                <div class="filter-group">
+                    <button class="btn btn-outline">Новые</button>
+                    <button class="btn btn-outline">Популярные</button>
+                    <button class="btn btn-primary">В тренде</button>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="btn btn-outline">Все</button>
+                    <button class="btn btn-outline">Анимация</button>
+                    <button class="btn btn-outline">Киностиль</button>
+                    <button class="btn btn-outline">Мемы</button>
+                </div>
+                
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Поиск по тегам...">
+                </div>
+            </div>
+            
+            <div class="gallery-grid">
+                <!-- Примеры работ -->
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/XQZ9X9x.jpg" alt="Аниме девушка в лесу">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>AnliUser123</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/Y9XQZ9X.jpg" alt="Киберпанк город">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>CyberCreator</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/Z9XQY9X.jpg" alt="Мультяшный кот">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>CatLover</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/Q9XZ9YX.jpg" alt="Фэнтези пейзаж">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>FantasyArt</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/YXQZ9X9.jpg" alt="Самурай">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>SamuraiMaster</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/XQY9Z9X.jpg" alt="Космическая сцена">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>SpaceExplorer</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/Z9YXQ9X.jpg" alt="Милый монстр">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>MonsterDesigner</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/9XQZY9X.jpg" alt="Ретро футуризм">
+                    <div class="item-overlay">
+                        <div class="item-author">
+                            <img src="https://i.imgur.com/JQZ1pQa.png" alt="Автор">
+                            <span>RetroFuture</span>
+                        </div>
+                        <div class="item-actions">
+                            <button class="action-btn"><i class="fas fa-heart"></i></button>
+                            <button class="action-btn"><i class="fas fa-share"></i></button>
+                            <button class="action-btn"><i class="fas fa-download"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Подвал -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>Anli</h3>
+                <ul class="footer-links">
+                    <li><a href="#">О нас</a></li>
+                    <li><a href="#">Карьера</a></li>
+                    <li><a href="#">Блог</a></li>
+                    <li><a href="#">Партнёры</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Помощь</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Центр поддержки</a></li>
+                    <li><a href="#">Частые вопросы</a></li>
+                    <li><a href="#">Сообщить о проблеме</a></li>
+                    <li><a href="#">Обратная связь</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Правовая информация</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Условия использования</a></li>
+                    <li><a href="#">Политика конфиденциальности</a></li>
+                    <li><a href="#">Политика cookies</a></li>
+                    <li><a href="#">Лицензионное соглашение</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Социальные сети</h3>
+                <p>Присоединяйтесь к нашему сообществу</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>© 2024 Anli. Все права защищены.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Навигация между разделами
+        document.getElementById('home-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('home-section');
+        });
+        
+        document.getElementById('create-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('create-section');
+        });
+        
+        document.getElementById('gallery-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showSection('gallery-section');
+        });
+        
+        function showSection(sectionId) {
+            // Скрыть все секции
+            document.getElementById('home-section').style.display = 'none';
+            document.getElementById('create-section').style.display = 'none';
+            document.getElementById('gallery-section').style.display = 'none';
+            
+            // Показать выбранную секцию
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Прокрутить вверх
+            window.scrollTo(0, 0);
+        }
+        
+        // Расширенные настройки
+        const advancedHeader = document.querySelector('.advanced-header');
+        const advancedContent = document.querySelector('.advanced-content');
+        const advancedIcon = document.querySelector('.advanced-header i');
+        
+        advancedHeader.addEventListener('click', function() {
+            if (advancedContent.style.display === 'block') {
+                advancedContent.style.display = 'none';
+                advancedIcon.className = 'fas fa-chevron-down';
+            } else {
+                advancedContent.style.display = 'block';
+                advancedIcon.className = 'fas fa-chevron-up';
+            }
+        });
+        
+        // Клик по примеру запроса
+        const exampleTags = document.querySelectorAll('.example-tag');
+        exampleTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelector('.prompt-input').value = this.textContent;
+            });
+        });
+        
+        // Инициализация - показать главную страницу
+        showSection('home-section');
+    </script>
+</body>
+</html>
